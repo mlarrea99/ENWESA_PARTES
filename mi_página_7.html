@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Parte de Trabajo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+    <style>
+        /* Fuente personalizada de Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+
+        /* Estilos generales */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/soft_wallpaper.png');
+            background-size: cover;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Contenedor principal del formulario */
+        #parteTrabajoForm {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 800px;
+            margin-top: 80px; /* Más espacio entre el logo y el título */
+            text-align: center;
+        }
+
+        /* Contenedor del logo */
+        .logo-container {
+            margin-bottom: 40px; /* Más espacio bajo el logo */
+        }
+
+        .logo-container img {
+            width: 150px;
+        }
+
+        /* Encabezado */
+        h2 {
+            color: #005f73;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        /* Estilos para los labels y los campos de entrada */
+        label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #005f73;
+            display: block;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        input[type="text"], input[type="date"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        /* Botones */
+        button, input[type="button"] {
+            background-color: #0a9396;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover, input[type="button"]:hover {
+            background-color: #005f73;
+        }
+
+        /* Contenedores y espacios */
+        .fechaGroup, .otGroup {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+
+        .otContainer {
+            margin-top: 15px;
+        }
+
+        .fechaGroup {
+            border-left: 5px solid #0a9396;
+        }
+
+        .otGroup {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            border-left: 3px solid #94d2bd;
+        }
+
+        /* Responsivo */
+        @media (max-width: 600px) {
+            body {
+                padding: 20px;
+            }
+
+            #parteTrabajoForm {
+                padding: 15px;
+                width: 100%;
+            }
+
+            button, input[type="button"] {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <form id="parteTrabajoForm">
+        <div class="logo-container">
+            <img src="https://www.investinspain.org/content/dam/icex-invest/img/logos/businesses/logo-enwesa.jpg" alt="Logo Enwesa">
+        </div>
+        
+        <h2>PARTE DE TRABAJO</h2>
+
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+
+        <label for="linea">Línea:</label>
+        <select id="linea" name="linea" required>
+            <option value="FA">FA</option>
+            <option value="NN">NN</option>
+            <option value="PA">PA</option>
+            <option value="PV">PV</option>
+        </select>
+
+        <div id="fechaContainer">
+            <div class="fechaGroup">
+                <label for="fecha">Fecha:</label>
+                <input type="date" class="fecha" name="fecha" required>
+
+                <div class="otContainer">
+                    <div class="otGroup">
+                        <label for="ot">OT:</label>
+                        <input type="text" class="ot" name="ot" required>
+
+                        <label for="obra">Obra:</label>
+                        <select class="obra" name="obra" required>
+                            <option value="HERAS">HERAS</option>
+                            <option value="TRASCUETO">TRASCUETO</option>
+                        </select>
+
+                        <label for="horasNormales">Horas Dedicadas:</label>
+                        <input type="number" class="horasNormales" name="horasNormales" required>
+
+                        <label for="observaciones">Observaciones:</label>
+                        <textarea class="observaciones" name="observaciones"></textarea>
+
+                        <label for="plusTransporte">Plus de Transporte (1 o 0):</label>
+                        <input type="number" class="plusTransporte" name="plusTransporte" min="0" max="1" required>
+                    </div>
+                </div>
+
+                <button type="button" onclick="agregarOT(this)">Agregar otra OT</button><br><br>
+            </div>
+        </div>
+
+        <button type="button" onclick="agregarFecha()">Agregar otra Fecha</button><br><br>
+
+        <input type="button" value="Guardar Datos" onclick="guardarDatos()">
+        <input type="button" value="Generar Excel" onclick="generarExcel()">
+    </form>
+
+    <script>
+        function agregarOT(button) {
+            const otContainer = button.previousElementSibling;
+            const newOTGroup = document.createElement('div');
+            newOTGroup.classList.add('otGroup');
+            newOTGroup.innerHTML = `
+                <label for="ot">OT:</label>
+                <input type="text" class="ot" name="ot" required>
+
+                <label for="obra">Obra:</label>
+                <select class="obra" name="obra" required>
+                    <option value="HERAS">HERAS</option>
+                    <option value="TRASCUETO">TRASCUETO</option>
+                </select>
+
+                <label for="horasNormales">Horas Dedicadas:</label>
+                <input type="number" class="horasNormales" name="horasNormales" required>
+
+                <label for="observaciones">Observaciones:</label>
+                <textarea class="observaciones" name="observaciones"></textarea>
+
+                <label for="plusTransporte">Plus de Transporte (1 o 0):</label>
+                <input type="number" class="plusTransporte" name="plusTransporte" min="0" max="1" required>
+            `;
+            otContainer.appendChild(newOTGroup);
+        }
+
+        function agregarFecha() {
+            const fechaContainer = document.getElementById('fechaContainer');
+            const newFechaGroup = document.createElement('div');
+            newFechaGroup.classList.add('fechaGroup');
+            newFechaGroup.innerHTML = `
+                <label for="fecha">Fecha:</label>
+                <input type="date" class="fecha" name="fecha" required>
+
+                <div class="otContainer">
+                    <div class="otGroup">
+                        <label for="ot">OT:</label>
+                        <input type="text" class="ot" name="ot" required>
+
+                        <label for="obra">Obra:</label>
+                        <select class="obra" name="obra" required>
+                            <option value="HERAS">HERAS</option>
+                            <option value="TRASCUETO">TRASCUETO</option>
+                        </select>
+
+                        <label for="horasNormales">Horas Dedicadas:</label>
+                        <input type="number" class="horasNormales" name="horasNormales" required>
+
+                        <label for="observaciones">Observaciones:</label>
+                        <textarea class="observaciones" name="observaciones"></textarea>
+                    <label for="plusTransporte">Plus de Transporte (1 o 0):</label>
+                    <input type="number" class="plusTransporte" name="plusTransporte" min="0" max="1" required>
+                </div>
+            </div>
+
+            <button type="button" onclick="agregarOT(this)">Agregar otra OT</button><br><br>
+        `;
+        fechaContainer.appendChild(newFechaGroup);
+    }
+
+    function guardarDatos() {
+        const nombre = document.getElementById('nombre').value;
+        const linea = document.getElementById('linea').value;
+        const fechaGroups = document.querySelectorAll('.fechaGroup');
+
+        let partes = JSON.parse(localStorage.getItem('partesTrabajo')) || [];
+
+        fechaGroups.forEach(group => {
+            const fecha = group.querySelector('.fecha').value;
+            const otGroups = group.querySelectorAll('.otGroup');
+
+            otGroups.forEach(otGroup => {
+                const ot = otGroup.querySelector('.ot').value;
+                const obra = otGroup.querySelector('.obra').value;
+                const horasNormales = otGroup.querySelector('.horasNormales').value;
+                const observaciones = otGroup.querySelector('.observaciones').value;
+                const plusTransporte = otGroup.querySelector('.plusTransporte').value;
+
+                const parteTrabajo = {
+                    nombre: nombre,
+                    linea: linea,
+                    fecha: fecha,
+                    ot: ot,
+                    obra: obra,
+                    horasNormales: horasNormales,
+                    observaciones: observaciones,
+                    plusTransporte: plusTransporte
+                };
+
+                partes.push(parteTrabajo);
+            });
+        });
+
+        localStorage.setItem('partesTrabajo', JSON.stringify(partes));
+        alert("Partes de trabajo guardados con éxito.");
+    }
+
+    function generarExcel() {
+        const partes = JSON.parse(localStorage.getItem('partesTrabajo')) || [];
+
+        // Añadir columnas vacías entre horasNormales y plusTransporte
+        partes.forEach(parte => {
+            for (let i = 0; i < 8; i++) {
+                parte[`vacio${i + 1}`] = ''; // Agregar 8 columnas vacías
+            }
+        });
+
+        // Crear la hoja de Excel
+        const worksheet = XLSX.utils.json_to_sheet(partes, { header: ['nombre', 'linea', 'fecha','observaciones', 'ot', 'obra', 'horasNormales', 'vacio1', 'vacio2', 'vacio3', 'vacio4', 'vacio5', 'vacio6', 'vacio7', 'vacio8', 'plusTransporte'] });
+
+        // Crear el libro de trabajo (workbook)
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "PartesTrabajo");
+
+        // Exportar el archivo Excel
+        XLSX.writeFile(workbook, "partes_trabajo.xlsx");
+    }
+</script>
+
+
